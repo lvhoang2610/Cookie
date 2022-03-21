@@ -1,0 +1,203 @@
+{\rtf1\ansi\deff0\nouicompat{\fonttbl{\f0\fnil\fcharset0 Calibri;}{\f1\fnil\fcharset128 MS PGothic;}}
+{\colortbl ;\red240\green216\blue168;}
+{\*\generator Riched20 10.0.17763}\viewkind4\uc1 
+\pard\f0\fs22\lang1033 SELECT `main_table`.*, `m_ttcg_dept`.`jp_ttcg_dept_name`, `m_ttcg_dept`.`en_ttcg_dept_name`, `m_ttcg_dept`.`ch_ttcg_dept_name` FROM `m_ttcg_division_group` AS `main_table`\par
+ INNER JOIN `m_ttcg_dept` ON m_ttcg_dept.ttcg_company_cd = main_table.ttcg_company_cd AND m_ttcg_dept.ttcg_dept_cd = main_table.ttcg_dept_cd AND m_ttcg_dept.start_date <= '2022-02-01' AND m_ttcg_dept.end_date >= '2022-02-01' AND m_ttcg_dept.is_deleted != 1 WHERE (`main_table`.`start_date` <= '2022-02-01') AND (`main_table`.`end_date` >= '2022-02-01') AND (`main_table`.`ttcg_company_cd` = 'S005') AND (`main_table`.`is_deleted` != '1') ORDER BY main_table.ttcg_dept_cd ASC, main_table.ttcg_section_cd ASC\par
+\par
+SELECT COUNT(*) FROM `m_local_biz_partner` AS `main_table`\par
+ INNER JOIN `m_glb_biz_partner` ON main_table.glb_biz_partner_cd = m_glb_biz_partner.glb_biz_partner_cd AND m_glb_biz_partner.is_deleted != TRUE WHERE ((`ovs_company_flg` = '1')) AND (`main_table`.`is_deleted` != '1') AND (`main_table`.`ttcg_company_cd` = 'S005')\par
+\par
+--Main Select --\par
+
+\pard\fs20 INSERT INTO db_gjdx_mysql.t_psi_crt_header\par
+(auto_id, psi_crt_no, psi_crt_date, psi_crt_ttcg_company_cd, psi_crt_ttcg_staff_id, psi_crt_ttcg_section_cd, psi_split_flg, ex_split_psi_no, profitable_chk_approval_type, profitable_chk_approval_req_no, psi_no, forwarder_glb_biz_partner_cd, sales_dest_glb_biz_partner_cd, transportation_type, dest_country_cd, ship_loading_schedule_date, ship_loading_result_link, approval_flg, si_approval_type, si_approval_apply_no, sts, invoice_no, bl_date, imp_landing_port_country_eta, accounted_date, correction_ship_loading_date, courier_invoice_numbering_flg, courier_invoice_amount, courier_invoice_amount_currency_cd, only_credit_note_crt_flg, accounted_registered_flg, ship_loading_setting_type, place_of_delivery, dest_place, exp_port_cd, remarks, create_at, operation_type, register_type, courier_invoice_no, registration_source_type, update_function_id, update_by, update_at, is_deleted, incoterms_cd)\par
+VALUES(3017, 'PSS0050000001', '2022-03-11', 'S005', 'TTC-USHR1', 'C6120', NULL, '', '01', '', '22030001', '', '0000000030', '02', 'JP', '2022-03-18', '', 1, '00', '', '20', 'T22C001', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2022-03-14 04:31:55', '01', '01', NULL, '01', 'POTPO1020', 'EXT-STF01', '2022-03-21 07:03:56', 1, 'CIF');\par
+\par
+\par
+\par
+SELECT\par
+\tab *\par
+FROM\par
+\tab `t_in_out_whse_schedule` AS `main_table`\par
+INNER JOIN (\par
+\tab SELECT\par
+\tab\tab in_out_whse_schedule_no,\par
+\tab\tab glb_parts_no,\par
+\tab\tab MIN(moving_turn) AS moving_turn\par
+\tab FROM\par
+\tab\tab t_in_out_whse_schedule\par
+\tab WHERE\par
+\tab\tab is_deleted = 0\par
+\tab\tab AND own_ttcg_company_cd = 'S005'\par
+\tab\tab AND logistics_pattern_type = "02"\par
+\tab\tab AND (psi_crt_no = ""\par
+\tab\tab\tab AND shipment_advisability_sts != "03")\par
+\tab GROUP BY\par
+\tab\tab in_out_whse_schedule_no,\par
+\tab\tab glb_parts_no\par
+UNION ALL\par
+\tab SELECT\par
+\tab\tab tiows.in_out_whse_schedule_no,\par
+\tab\tab tiows.glb_parts_no,\par
+\tab\tab tiows.moving_turn\par
+\tab FROM\par
+\tab\tab t_in_out_whse_schedule tiows\par
+\tab INNER JOIN t_psi_crt_dtl tpcd ON\par
+\tab\tab tiows.in_out_whse_schedule_no = tpcd.in_out_whse_schedule_no\par
+\tab\tab AND tiows.dtl_no = tpcd.dtl_no\par
+\tab WHERE\par
+\tab\tab (tiows.own_ttcg_company_cd = 'S005'\par
+\tab\tab\tab AND tiows.shipment_advisability_sts != "03"\par
+\tab\tab\tab AND tiows.dtl_no != ""\par
+\tab\tab\tab AND (tpcd.psi_dtl_invalid_flg = 1\par
+\tab\tab\tab\tab OR tpcd.sampling_target_flg = 1)\par
+\tab\tab\tab AND tpcd.is_deleted = 0\par
+\tab\tab\tab AND tiows.is_deleted = 0) ) AS `t_in_out_whse_schedule_min` ON\par
+\tab t_in_out_whse_schedule_min.in_out_whse_schedule_no = main_table.in_out_whse_schedule_no\par
+\tab AND t_in_out_whse_schedule_min.moving_turn = main_table.moving_turn\par
+LEFT JOIN `m_biz_partner_base` ON\par
+\tab m_biz_partner_base.ttcg_company_cd = main_table.own_ttcg_company_cd\par
+\tab AND m_biz_partner_base.glb_biz_partner_cd = main_table.out_whse_base_glb_biz_partner_cd\par
+\tab AND m_biz_partner_base.biz_partner_base_cd = main_table.out_whse_base_biz_partner_base_cd\par
+\tab AND m_biz_partner_base.is_deleted = '0'\par
+LEFT JOIN `m_ttcg_base` ON\par
+\tab m_ttcg_base.ttcg_company_cd = main_table.own_ttcg_company_cd\par
+\tab AND m_ttcg_base.ttcg_base_cd = main_table.out_whse_base_ttcg_base_cd\par
+\tab AND m_ttcg_base.is_deleted = '0'\par
+LEFT JOIN `t_in_whse_result` ON\par
+\tab t_in_whse_result.in_out_whse_schedule_no = main_table.in_out_whse_schedule_no\par
+\tab AND t_in_whse_result.dtl_no = main_table.dtl_no\par
+\tab AND t_in_whse_result.is_deleted = '0'\par
+INNER JOIN `m_ttcg_biz_day` ON\par
+\tab m_ttcg_biz_day.ttcg_company_cd = 'S005'\par
+\tab AND m_ttcg_biz_day.is_deleted = '0'\par
+INNER JOIN `m_ttcg_division_group` ON\par
+\tab m_ttcg_division_group.ttcg_company_cd = main_table.own_ttcg_company_cd\par
+\tab AND m_ttcg_division_group.ttcg_section_cd = main_table.in_out_whse_func_section_cd\par
+\tab AND m_ttcg_division_group.start_date <= m_ttcg_biz_day.biz_date\par
+\tab AND m_ttcg_division_group.end_date >= m_ttcg_biz_day.biz_date\par
+\tab AND m_ttcg_division_group.is_deleted = '0'\par
+INNER JOIN `m_local_biz_partner` AS `m_local_biz_partner_end_user` ON\par
+\tab m_local_biz_partner_end_user.ttcg_company_cd = main_table.own_ttcg_company_cd\par
+\tab AND m_local_biz_partner_end_user.glb_biz_partner_cd = main_table.eur_glb_biz_partner_cd\par
+\tab AND m_local_biz_partner_end_user.is_deleted = '0'\par
+INNER JOIN `m_biz_partner_base` AS `m_biz_partner_base_end_user` ON\par
+\tab m_biz_partner_base_end_user.ttcg_company_cd = main_table.own_ttcg_company_cd\par
+\tab AND m_biz_partner_base_end_user.glb_biz_partner_cd = main_table.eur_glb_biz_partner_cd\par
+\tab AND m_biz_partner_base_end_user.biz_partner_base_cd = main_table.eur_biz_partner_base_cd\par
+\tab AND m_biz_partner_base_end_user.is_deleted = '0'\par
+INNER JOIN `m_local_biz_partner` AS `m_local_biz_partner_seller` ON\par
+\tab m_local_biz_partner_seller.ttcg_company_cd = main_table.own_ttcg_company_cd\par
+\tab AND m_local_biz_partner_seller.glb_biz_partner_cd = main_table.sales_glb_biz_partner_cd\par
+\tab AND m_local_biz_partner_seller.is_deleted = '0'\par
+INNER JOIN (\par
+\tab SELECT\par
+\tab\tab tiows.in_whse_base_base_type,\par
+\tab\tab tiows.in_whse_base_ttcg_base_cd,\par
+\tab\tab tiows.in_whse_base_glb_biz_partner_cd,\par
+\tab\tab tiows.in_out_whse_schedule_no,\par
+\tab\tab tiows.own_ttcg_company_cd,\par
+\tab\tab tiows.out_whse_base_biz_partner_type,\par
+\tab\tab tiows.in_whse_base_biz_partner_type,\par
+\tab\tab tiows.sts\par
+\tab FROM\par
+\tab\tab t_in_out_whse_schedule tiows\par
+\tab INNER JOIN (\par
+\tab\tab SELECT\par
+\tab\tab\tab in_out_whse_schedule_no,\par
+\tab\tab\tab own_ttcg_company_cd,\par
+\tab\tab\tab MAX(moving_turn) AS moving_turn\par
+\tab\tab FROM\par
+\tab\tab\tab t_in_out_whse_schedule\par
+\tab\tab WHERE\par
+\tab\tab\tab is_deleted = 0\par
+\tab\tab\tab AND out_whse_base_biz_partner_type = "02"\par
+\tab\tab GROUP BY\par
+\tab\tab\tab in_out_whse_schedule_no,\par
+\tab\tab\tab own_ttcg_company_cd) AS t_in_out_whse_schedule_mv ON\par
+\tab\tab tiows.in_out_whse_schedule_no = t_in_out_whse_schedule_mv.in_out_whse_schedule_no\par
+\tab\tab AND tiows.moving_turn = t_in_out_whse_schedule_mv.moving_turn\par
+\tab\tab AND tiows.out_whse_base_biz_partner_type = "02"\par
+\tab\tab AND tiows.own_ttcg_company_cd = t_in_out_whse_schedule_mv.own_ttcg_company_cd) AS `t_in_out_whse_schedule_max` ON\par
+\tab t_in_out_whse_schedule_max.in_out_whse_schedule_no = main_table.in_out_whse_schedule_no\par
+LEFT JOIN `m_ttcg_base` AS `m_ttcg_base_deli_des` ON\par
+\tab m_ttcg_base_deli_des.ttcg_company_cd = t_in_out_whse_schedule_max.own_ttcg_company_cd\par
+\tab AND m_ttcg_base_deli_des.ttcg_base_cd = t_in_out_whse_schedule_max.in_whse_base_ttcg_base_cd\par
+\tab AND t_in_out_whse_schedule_max.in_whse_base_base_type = '10'\par
+\tab AND m_ttcg_base_deli_des.is_deleted = '0'\par
+LEFT JOIN `m_local_biz_partner` AS `m_local_biz_partner_deli_des` ON\par
+\tab m_local_biz_partner_deli_des.ttcg_company_cd = t_in_out_whse_schedule_max.own_ttcg_company_cd\par
+\tab AND m_local_biz_partner_deli_des.glb_biz_partner_cd = t_in_out_whse_schedule_max.in_whse_base_glb_biz_partner_cd\par
+\tab AND t_in_out_whse_schedule_max.in_whse_base_biz_partner_type = '20'\par
+\tab AND m_local_biz_partner_deli_des.is_deleted = '0'\par
+INNER JOIN (\par
+\tab SELECT\par
+\tab\tab tiows.own_ttcg_company_cd,\par
+\tab\tab tiows.out_whse_base_biz_partner_type,\par
+\tab\tab tiows.out_whse_base_glb_biz_partner_cd,\par
+\tab\tab tiows.in_out_whse_schedule_no\par
+\tab FROM\par
+\tab\tab t_in_out_whse_schedule tiows\par
+\tab INNER JOIN (\par
+\tab\tab SELECT\par
+\tab\tab\tab in_out_whse_schedule_no,\par
+\tab\tab\tab own_ttcg_company_cd,\par
+\tab\tab\tab MAX(moving_turn) AS moving_turn\par
+\tab\tab FROM\par
+\tab\tab\tab t_in_out_whse_schedule\par
+\tab\tab WHERE\par
+\tab\tab\tab is_deleted = 0\par
+\tab\tab\tab AND out_whse_base_biz_partner_type = "04"\par
+\tab\tab GROUP BY\par
+\tab\tab\tab in_out_whse_schedule_no,\par
+\tab\tab\tab own_ttcg_company_cd) AS t_in_out_whse_schedule_mv ON\par
+\tab\tab tiows.in_out_whse_schedule_no = t_in_out_whse_schedule_mv.in_out_whse_schedule_no\par
+\tab\tab AND tiows.moving_turn = t_in_out_whse_schedule_mv.moving_turn\par
+\tab\tab AND tiows.out_whse_base_biz_partner_type = "04"\par
+\tab\tab AND tiows.own_ttcg_company_cd = t_in_out_whse_schedule_mv.own_ttcg_company_cd) AS `t_in_out_whse_schedule_max_forwarder` ON\par
+\tab t_in_out_whse_schedule_max_forwarder.in_out_whse_schedule_no = main_table.in_out_whse_schedule_no\par
+INNER JOIN `m_local_biz_partner` AS `m_local_biz_partner_forwarder` ON\par
+\tab m_local_biz_partner_forwarder.ttcg_company_cd = t_in_out_whse_schedule_max_forwarder.own_ttcg_company_cd\par
+\tab AND m_local_biz_partner_forwarder.glb_biz_partner_cd = t_in_out_whse_schedule_max_forwarder.out_whse_base_glb_biz_partner_cd\par
+\tab AND m_local_biz_partner_forwarder.is_deleted = '0'\par
+INNER JOIN `m_quantity_unit` ON\par
+\tab m_quantity_unit.quantity_unit_cd = main_table.quantity_unit_cd\par
+\tab AND m_quantity_unit.is_deleted = '0'\par
+INNER JOIN `t_sales_order_dtl` ON\par
+\tab t_sales_order_dtl.sales_order_no = main_table.sales_order_no\par
+\tab AND t_sales_order_dtl.sales_order_dtl_no = main_table.sales_order_dtl_no\par
+\tab AND t_sales_order_dtl.is_deleted = '0'\par
+INNER JOIN `t_sales_delivery_date_ans_delivery` ON\par
+\tab t_sales_delivery_date_ans_delivery.sales_order_no = main_table.sales_order_no\par
+\tab AND t_sales_delivery_date_ans_delivery.sales_order_dtl_no = main_table.sales_order_dtl_no\par
+\tab AND t_sales_delivery_date_ans_delivery.sales_order_delivery_serial_no = main_table.sales_order_delivery_serial_no\par
+\tab AND t_sales_delivery_date_ans_delivery.is_deleted = '0'\par
+INNER JOIN `m_ttcg_parts` ON\par
+\tab m_ttcg_parts.ttcg_company_cd = main_table.own_ttcg_company_cd\par
+\tab AND m_ttcg_parts.glb_parts_no = main_table.glb_parts_no\par
+\tab AND m_ttcg_parts.is_deleted = '0'\par
+INNER JOIN `\highlight1 m_ttcg_hs_code\highlight0 ` ON\par
+\tab\highlight1 m_ttcg_hs_code\highlight0 .ttcg_company_cd = main_table.own_ttcg_company_cd\par
+\tab AND \highlight1 m_ttcg_hs_code\highlight0 .glb_parts_no = main_table.glb_parts_no\par
+\tab AND \highlight1 m_ttcg_hs_code\highlight0 .forwarder_cd = main_table.responsible_forwarder_cd\par
+\tab AND \highlight1 m_ttcg_hs_code\highlight0 .logistics_pattern_type = main_table.logistics_pattern_type\par
+\tab AND \highlight1 m_ttcg_hs_code\highlight0 .is_deleted = '0'\par
+LEFT JOIN `t_psi_crt_header` ON\par
+\tab t_psi_crt_header.psi_crt_no = main_table.psi_crt_no\par
+\tab AND t_psi_crt_header.is_deleted = '0'\par
+WHERE\par
+\tab ((m_ttcg_base.ttcg_company_cd = 'S005'\par
+\tab\tab AND m_ttcg_base.packing_instr_dest_flg = 1\par
+\tab\tab AND m_ttcg_base.is_deleted = 0\par
+\tab\tab AND main_table.out_whse_base_base_type = "10")\par
+\tab OR (m_biz_partner_base.ttcg_company_cd = 'S005'\par
+\tab\tab AND m_biz_partner_base.packing_instr_dest_flg = 1\par
+\tab\tab AND m_biz_partner_base.is_deleted = 0\par
+\tab\tab AND main_table.out_whse_base_base_type = "20"))\par
+\tab AND ((`m_ttcg_division_group`.`jp_section_name` = '\f1\'93\'8c\'83\'41\'83\'57\'83\'41\f0 G'))\par
+\tab AND ((`m_local_biz_partner_seller`.`jp_biz_partner_nm` = 'TMMK \f1\'96\'6b\'95\'c4\'83\'67\'83\'88\'83\'5e\f0  \f1\'83\'50\'83\'93\'83\'5e\'83\'62\'83\'4c\'81\'5b\'8d\'48\'8f\'ea\f0 '))\par
+\tab AND ((`main_table`.`transportation_type` = '01'))\par
+
+\pard\tab AND ((`main_table`.`incoterms_cd` = 'CIF'))\fs22\par
+}
+ 
