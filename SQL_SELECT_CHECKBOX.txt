@@ -1,0 +1,17 @@
+﻿SELECT
+	`main_table`.`auto_id`
+FROM
+	`t_in_out_whse_schedule` AS `main_table`
+
+INNER JOIN `t_psi_crt_dtl` ON
+	main_table.in_out_whse_schedule_no = t_psi_crt_dtl.in_out_whse_schedule_no
+	AND main_table.dtl_no = t_psi_crt_dtl.dtl_no
+	AND t_psi_crt_dtl.psi_dtl_invalid_flg = 0
+	AND t_psi_crt_dtl.sampling_target_flg = 0
+	AND t_psi_crt_dtl.is_deleted = 0
+	INNER JOIN `t_psi_crt_header` ON
+	t_psi_crt_header.psi_crt_no = t_psi_crt_dtl.psi_crt_no
+	AND t_psi_crt_header.is_deleted = 0
+WHERE
+	(main_table.is_deleted = 0)
+	AND ((t_psi_crt_header.psi_crt_no = 'PSS0050000021'))
