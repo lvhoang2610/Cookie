@@ -1,189 +1,204 @@
-{\rtf1\ansi\deff0\nouicompat{\fonttbl{\f0\fnil Courier New;}{\f1\fnil\fcharset128 MS PGothic;}{\f2\fnil\fcharset0 Courier New;}}
-{\colortbl ;\red128\green0\blue0;\red0\green0\blue0;\red0\green0\blue128;\red0\green0\blue255;\red0\green128\blue0;}
-{\*\generator Riched20 10.0.17763}\viewkind4\uc1 
-\pard\cf1\b\f0\fs20\lang1033 SELECT\cf0\b0\par
-\cf2\tab *\cf0\par
-\cf1\b FROM\cf0\b0\par
-\cf2\tab\cf3 `t_in_out_whse_schedule`\cf2  \cf1\b AS\cf2\b0  \cf3 `main_table`\cf0\par
-\cf1\b INNER\cf2\b0  \cf1\b JOIN\cf2\b0  (\cf0\par
-\cf2\tab\cf1\b SELECT\cf0\b0\par
-\cf2\tab\tab in_out_whse_schedule_no,\cf0\par
-\cf2\tab\tab glb_parts_no,\cf0\par
-\cf2\tab\tab\cf3\b MIN\cf2\b0 (moving_turn) \cf1\b AS\cf2\b0  moving_turn\cf0\par
-\cf2\tab\cf1\b FROM\cf0\b0\par
-\cf2\tab\tab t_in_out_whse_schedule\cf0\par
-\cf2\tab\cf1\b WHERE\cf0\b0\par
-\cf2\tab\tab is_deleted = \cf4 0\cf0\par
-\cf2\tab\tab\cf1\b AND\cf2\b0  own_ttcg_company_cd = \cf5 'S005'\cf0\par
-\cf2\tab\tab\cf1\b AND\cf2\b0  logistics_pattern_type = \cf3 "02"\cf0\par
-\cf2\tab\tab\cf1\b AND\cf2\b0  (psi_crt_no = \cf3 ""\cf0\par
-\cf2\tab\tab\tab\cf1\b AND\cf2\b0  shipment_advisability_sts != \cf3 "03"\cf2 )\cf0\par
-\cf2\tab\cf1\b GROUP\cf2\b0  \cf1\b BY\cf0\b0\par
-\cf2\tab\tab in_out_whse_schedule_no,\cf0\par
-\cf2\tab\tab glb_parts_no\cf0\par
-\cf1\b UNION\cf2\b0  \cf1\b ALL\cf0\b0\par
-\cf2\tab\cf1\b SELECT\cf0\b0\par
-\cf2\tab\tab tiows.in_out_whse_schedule_no,\cf0\par
-\cf2\tab\tab tiows.glb_parts_no,\cf0\par
-\cf2\tab\tab tiows.moving_turn\cf0\par
-\cf2\tab\cf1\b FROM\cf0\b0\par
-\cf2\tab\tab t_in_out_whse_schedule tiows\cf0\par
-\cf2\tab\cf1\b INNER\cf2\b0  \cf1\b JOIN\cf2\b0  t_psi_crt_dtl tpcd \cf1\b ON\cf0\b0\par
-\cf2\tab\tab tiows.in_out_whse_schedule_no = tpcd.in_out_whse_schedule_no\cf0\par
-\cf2\tab\tab\cf1\b AND\cf2\b0  tiows.dtl_no = tpcd.dtl_no\cf0\par
-\cf2\tab\cf1\b WHERE\cf0\b0\par
-\cf2\tab\tab (tiows.own_ttcg_company_cd = \cf5 'S005'\cf0\par
-\cf2\tab\tab\tab\cf1\b AND\cf2\b0  tiows.shipment_advisability_sts != \cf3 "03"\cf0\par
-\cf2\tab\tab\tab\cf1\b AND\cf2\b0  tiows.dtl_no != \cf3 ""\cf0\par
-\cf2\tab\tab\tab\cf1\b AND\cf2\b0  (tpcd.psi_dtl_invalid_flg = \cf4 1\cf0\par
-\cf2\tab\tab\tab\tab\cf1\b OR\cf2\b0  tpcd.sampling_target_flg = \cf4 1\cf2 )\cf0\par
-\cf2\tab\tab\tab\cf1\b AND\cf2\b0  tpcd.is_deleted = \cf4 0\cf0\par
-\cf2\tab\tab\tab\cf1\b AND\cf2\b0  tiows.is_deleted = \cf4 0\cf2 ) ) \cf1\b AS\cf2\b0  \cf3 `t_in_out_whse_schedule_min`\cf2  \cf1\b ON\cf0\b0\par
-\cf2\tab t_in_out_whse_schedule_min.in_out_whse_schedule_no = main_table.in_out_whse_schedule_no\cf0\par
-\cf2\tab\cf1\b AND\cf2\b0  t_in_out_whse_schedule_min.moving_turn = main_table.moving_turn\cf0\par
-\cf1\b LEFT\cf2\b0  \cf1\b JOIN\cf2\b0  \cf3 `m_biz_partner_base`\cf2  \cf1\b ON\cf0\b0\par
-\cf2\tab m_biz_partner_base.ttcg_company_cd = main_table.own_ttcg_company_cd\cf0\par
-\cf2\tab\cf1\b AND\cf2\b0  m_biz_partner_base.glb_biz_partner_cd = main_table.out_whse_base_glb_biz_partner_cd\cf0\par
-\cf2\tab\cf1\b AND\cf2\b0  m_biz_partner_base.biz_partner_base_cd = main_table.out_whse_base_biz_partner_base_cd\cf0\par
-\cf2\tab\cf1\b AND\cf2\b0  m_biz_partner_base.is_deleted = \cf5 '0'\cf0\par
-\cf1\b LEFT\cf2\b0  \cf1\b JOIN\cf2\b0  \cf3 `m_ttcg_base`\cf2  \cf1\b ON\cf0\b0\par
-\cf2\tab m_ttcg_base.ttcg_company_cd = main_table.own_ttcg_company_cd\cf0\par
-\cf2\tab\cf1\b AND\cf2\b0  m_ttcg_base.ttcg_base_cd = main_table.out_whse_base_ttcg_base_cd\cf0\par
-\cf2\tab\cf1\b AND\cf2\b0  m_ttcg_base.is_deleted = \cf5 '0'\cf0\par
-\cf1\b LEFT\cf2\b0  \cf1\b JOIN\cf2\b0  \cf3 `t_in_whse_result`\cf2  \cf1\b ON\cf0\b0\par
-\cf2\tab t_in_whse_result.in_out_whse_schedule_no = main_table.in_out_whse_schedule_no\cf0\par
-\cf2\tab\cf1\b AND\cf2\b0  t_in_whse_result.dtl_no = main_table.dtl_no\cf0\par
-\cf2\tab\cf1\b AND\cf2\b0  t_in_whse_result.is_deleted = \cf5 '0'\cf0\par
-\cf1\b INNER\cf2\b0  \cf1\b JOIN\cf2\b0  \cf3 `m_ttcg_biz_day`\cf2  \cf1\b ON\cf0\b0\par
-\cf2\tab m_ttcg_biz_day.ttcg_company_cd = \cf5 'S005'\cf0\par
-\cf2\tab\cf1\b AND\cf2\b0  m_ttcg_biz_day.is_deleted = \cf5 '0'\cf0\par
-\cf1\b INNER\cf2\b0  \cf1\b JOIN\cf2\b0  \cf3 `m_ttcg_division_group`\cf2  \cf1\b ON\cf0\b0\par
-\cf2\tab m_ttcg_division_group.ttcg_company_cd = main_table.own_ttcg_company_cd\cf0\par
-\cf2\tab\cf1\b AND\cf2\b0  m_ttcg_division_group.ttcg_section_cd = main_table.in_out_whse_func_section_cd\cf0\par
-\cf2\tab\cf1\b AND\cf2\b0  m_ttcg_division_group.start_date <= m_ttcg_biz_day.biz_date\cf0\par
-\cf2\tab\cf1\b AND\cf2\b0  m_ttcg_division_group.end_date >= m_ttcg_biz_day.biz_date\cf0\par
-\cf2\tab\cf1\b AND\cf2\b0  m_ttcg_division_group.is_deleted = \cf5 '0'\cf0\par
-\cf1\b INNER\cf2\b0  \cf1\b JOIN\cf2\b0  \cf3 `m_local_biz_partner`\cf2  \cf1\b AS\cf2\b0  \cf3 `m_local_biz_partner_end_user`\cf2  \cf1\b ON\cf0\b0\par
-\cf2\tab m_local_biz_partner_end_user.ttcg_company_cd = main_table.own_ttcg_company_cd\cf0\par
-\cf2\tab\cf1\b AND\cf2\b0  m_local_biz_partner_end_user.glb_biz_partner_cd = main_table.eur_glb_biz_partner_cd\cf0\par
-\cf2\tab\cf1\b AND\cf2\b0  m_local_biz_partner_end_user.is_deleted = \cf5 '0'\cf0\par
-\cf1\b INNER\cf2\b0  \cf1\b JOIN\cf2\b0  \cf3 `m_biz_partner_base`\cf2  \cf1\b AS\cf2\b0  \cf3 `m_biz_partner_base_end_user`\cf2  \cf1\b ON\cf0\b0\par
-\cf2\tab m_biz_partner_base_end_user.ttcg_company_cd = main_table.own_ttcg_company_cd\cf0\par
-\cf2\tab\cf1\b AND\cf2\b0  m_biz_partner_base_end_user.glb_biz_partner_cd = main_table.eur_glb_biz_partner_cd\cf0\par
-\cf2\tab\cf1\b AND\cf2\b0  m_biz_partner_base_end_user.biz_partner_base_cd = main_table.eur_biz_partner_base_cd\cf0\par
-\cf2\tab\cf1\b AND\cf2\b0  m_biz_partner_base_end_user.is_deleted = \cf5 '0'\cf0\par
-\cf1\b INNER\cf2\b0  \cf1\b JOIN\cf2\b0  \cf3 `m_local_biz_partner`\cf2  \cf1\b AS\cf2\b0  \cf3 `m_local_biz_partner_seller`\cf2  \cf1\b ON\cf0\b0\par
-\cf2\tab m_local_biz_partner_seller.ttcg_company_cd = main_table.own_ttcg_company_cd\cf0\par
-\cf2\tab\cf1\b AND\cf2\b0  m_local_biz_partner_seller.glb_biz_partner_cd = main_table.sales_glb_biz_partner_cd\cf0\par
-\cf2\tab\cf1\b AND\cf2\b0  m_local_biz_partner_seller.is_deleted = \cf5 '0'\cf0\par
-\cf1\b INNER\cf2\b0  \cf1\b JOIN\cf2\b0  (\cf0\par
-\cf2\tab\cf1\b SELECT\cf0\b0\par
-\cf2\tab\tab tiows.in_whse_base_base_type,\cf0\par
-\cf2\tab\tab tiows.in_whse_base_ttcg_base_cd,\cf0\par
-\cf2\tab\tab tiows.in_whse_base_glb_biz_partner_cd,\cf0\par
-\cf2\tab\tab tiows.in_out_whse_schedule_no,\cf0\par
-\cf2\tab\tab tiows.own_ttcg_company_cd,\cf0\par
-\cf2\tab\tab tiows.out_whse_base_biz_partner_type,\cf0\par
-\cf2\tab\tab tiows.in_whse_base_biz_partner_type,\cf0\par
-\cf2\tab\tab tiows.sts\cf0\par
-\cf2\tab\cf1\b FROM\cf0\b0\par
-\cf2\tab\tab t_in_out_whse_schedule tiows\cf0\par
-\cf2\tab\cf1\b INNER\cf2\b0  \cf1\b JOIN\cf2\b0  (\cf0\par
-\cf2\tab\tab\cf1\b SELECT\cf0\b0\par
-\cf2\tab\tab\tab in_out_whse_schedule_no,\cf0\par
-\cf2\tab\tab\tab own_ttcg_company_cd,\cf0\par
-\cf2\tab\tab\tab\cf3\b MAX\cf2\b0 (moving_turn) \cf1\b AS\cf2\b0  moving_turn\cf0\par
-\cf2\tab\tab\cf1\b FROM\cf0\b0\par
-\cf2\tab\tab\tab t_in_out_whse_schedule\cf0\par
-\cf2\tab\tab\cf1\b WHERE\cf0\b0\par
-\cf2\tab\tab\tab is_deleted = \cf4 0\cf0\par
-\cf2\tab\tab\tab\cf1\b AND\cf2\b0  out_whse_base_biz_partner_type = \cf3 "02"\cf0\par
-\cf2\tab\tab\cf1\b GROUP\cf2\b0  \cf1\b BY\cf0\b0\par
-\cf2\tab\tab\tab in_out_whse_schedule_no,\cf0\par
-\cf2\tab\tab\tab own_ttcg_company_cd) \cf1\b AS\cf2\b0  t_in_out_whse_schedule_mv \cf1\b ON\cf0\b0\par
-\cf2\tab\tab tiows.in_out_whse_schedule_no = t_in_out_whse_schedule_mv.in_out_whse_schedule_no\cf0\par
-\cf2\tab\tab\cf1\b AND\cf2\b0  tiows.moving_turn = t_in_out_whse_schedule_mv.moving_turn\cf0\par
-\cf2\tab\tab\cf1\b AND\cf2\b0  tiows.out_whse_base_biz_partner_type = \cf3 "02"\cf0\par
-\cf2\tab\tab\cf1\b AND\cf2\b0  tiows.own_ttcg_company_cd = t_in_out_whse_schedule_mv.own_ttcg_company_cd) \cf1\b AS\cf2\b0  \cf3 `t_in_out_whse_schedule_max`\cf2  \cf1\b ON\cf0\b0\par
-\cf2\tab t_in_out_whse_schedule_max.in_out_whse_schedule_no = main_table.in_out_whse_schedule_no\cf0\par
-\cf1\b LEFT\cf2\b0  \cf1\b JOIN\cf2\b0  \cf3 `m_ttcg_base`\cf2  \cf1\b AS\cf2\b0  \cf3 `m_ttcg_base_deli_des`\cf2  \cf1\b ON\cf0\b0\par
-\cf2\tab m_ttcg_base_deli_des.ttcg_company_cd = t_in_out_whse_schedule_max.own_ttcg_company_cd\cf0\par
-\cf2\tab\cf1\b AND\cf2\b0  m_ttcg_base_deli_des.ttcg_base_cd = t_in_out_whse_schedule_max.in_whse_base_ttcg_base_cd\cf0\par
-\cf2\tab\cf1\b AND\cf2\b0  t_in_out_whse_schedule_max.in_whse_base_base_type = \cf5 '10'\cf0\par
-\cf2\tab\cf1\b AND\cf2\b0  m_ttcg_base_deli_des.is_deleted = \cf5 '0'\cf0\par
-\cf1\b LEFT\cf2\b0  \cf1\b JOIN\cf2\b0  \cf3 `m_local_biz_partner`\cf2  \cf1\b AS\cf2\b0  \cf3 `m_local_biz_partner_deli_des`\cf2  \cf1\b ON\cf0\b0\par
-\cf2\tab m_local_biz_partner_deli_des.ttcg_company_cd = t_in_out_whse_schedule_max.own_ttcg_company_cd\cf0\par
-\cf2\tab\cf1\b AND\cf2\b0  m_local_biz_partner_deli_des.glb_biz_partner_cd = t_in_out_whse_schedule_max.in_whse_base_glb_biz_partner_cd\cf0\par
-\cf2\tab\cf1\b AND\cf2\b0  t_in_out_whse_schedule_max.in_whse_base_biz_partner_type = \cf5 '20'\cf0\par
-\cf2\tab\cf1\b AND\cf2\b0  m_local_biz_partner_deli_des.is_deleted = \cf5 '0'\cf0\par
-\cf1\b INNER\cf2\b0  \cf1\b JOIN\cf2\b0  (\cf0\par
-\cf2\tab\cf1\b SELECT\cf0\b0\par
-\cf2\tab\tab tiows.own_ttcg_company_cd,\cf0\par
-\cf2\tab\tab tiows.out_whse_base_biz_partner_type,\cf0\par
-\cf2\tab\tab tiows.out_whse_base_glb_biz_partner_cd,\cf0\par
-\cf2\tab\tab tiows.in_out_whse_schedule_no\cf0\par
-\cf2\tab\cf1\b FROM\cf0\b0\par
-\cf2\tab\tab t_in_out_whse_schedule tiows\cf0\par
-\cf2\tab\cf1\b INNER\cf2\b0  \cf1\b JOIN\cf2\b0  (\cf0\par
-\cf2\tab\tab\cf1\b SELECT\cf0\b0\par
-\cf2\tab\tab\tab in_out_whse_schedule_no,\cf0\par
-\cf2\tab\tab\tab own_ttcg_company_cd,\cf0\par
-\cf2\tab\tab\tab\cf3\b MAX\cf2\b0 (moving_turn) \cf1\b AS\cf2\b0  moving_turn\cf0\par
-\cf2\tab\tab\cf1\b FROM\cf0\b0\par
-\cf2\tab\tab\tab t_in_out_whse_schedule\cf0\par
-\cf2\tab\tab\cf1\b WHERE\cf0\b0\par
-\cf2\tab\tab\tab is_deleted = \cf4 0\cf0\par
-\cf2\tab\tab\tab\cf1\b AND\cf2\b0  out_whse_base_biz_partner_type = \cf3 "04"\cf0\par
-\cf2\tab\tab\cf1\b GROUP\cf2\b0  \cf1\b BY\cf0\b0\par
-\cf2\tab\tab\tab in_out_whse_schedule_no,\cf0\par
-\cf2\tab\tab\tab own_ttcg_company_cd) \cf1\b AS\cf2\b0  t_in_out_whse_schedule_mv \cf1\b ON\cf0\b0\par
-\cf2\tab\tab tiows.in_out_whse_schedule_no = t_in_out_whse_schedule_mv.in_out_whse_schedule_no\cf0\par
-\cf2\tab\tab\cf1\b AND\cf2\b0  tiows.moving_turn = t_in_out_whse_schedule_mv.moving_turn\cf0\par
-\cf2\tab\tab\cf1\b AND\cf2\b0  tiows.out_whse_base_biz_partner_type = \cf3 "04"\cf0\par
-\cf2\tab\tab\cf1\b AND\cf2\b0  tiows.own_ttcg_company_cd = t_in_out_whse_schedule_mv.own_ttcg_company_cd) \cf1\b AS\cf2\b0  \cf3 `t_in_out_whse_schedule_max_forwarder`\cf2  \cf1\b ON\cf0\b0\par
-\cf2\tab t_in_out_whse_schedule_max_forwarder.in_out_whse_schedule_no = main_table.in_out_whse_schedule_no\cf0\par
-\cf1\b INNER\cf2\b0  \cf1\b JOIN\cf2\b0  \cf3 `m_local_biz_partner`\cf2  \cf1\b AS\cf2\b0  \cf3 `m_local_biz_partner_forwarder`\cf2  \cf1\b ON\cf0\b0\par
-\cf2\tab m_local_biz_partner_forwarder.ttcg_company_cd = t_in_out_whse_schedule_max_forwarder.own_ttcg_company_cd\cf0\par
-\cf2\tab\cf1\b AND\cf2\b0  m_local_biz_partner_forwarder.glb_biz_partner_cd = t_in_out_whse_schedule_max_forwarder.out_whse_base_glb_biz_partner_cd\cf0\par
-\cf2\tab\cf1\b AND\cf2\b0  m_local_biz_partner_forwarder.is_deleted = \cf5 '0'\cf0\par
-\cf1\b INNER\cf2\b0  \cf1\b JOIN\cf2\b0  \cf3 `m_quantity_unit`\cf2  \cf1\b ON\cf0\b0\par
-\cf2\tab m_quantity_unit.quantity_unit_cd = main_table.quantity_unit_cd\cf0\par
-\cf2\tab\cf1\b AND\cf2\b0  m_quantity_unit.is_deleted = \cf5 '0'\cf0\par
-\cf1\b INNER\cf2\b0  \cf1\b JOIN\cf2\b0  \cf3 `t_sales_order_dtl`\cf2  \cf1\b ON\cf0\b0\par
-\cf2\tab t_sales_order_dtl.sales_order_no = main_table.sales_order_no\cf0\par
-\cf2\tab\cf1\b AND\cf2\b0  t_sales_order_dtl.sales_order_dtl_no = main_table.sales_order_dtl_no\cf0\par
-\cf2\tab\cf1\b AND\cf2\b0  t_sales_order_dtl.is_deleted = \cf5 '0'\cf0\par
-\cf1\b INNER\cf2\b0  \cf1\b JOIN\cf2\b0  \cf3 `t_sales_delivery_date_ans_delivery`\cf2  \cf1\b ON\cf0\b0\par
-\cf2\tab t_sales_delivery_date_ans_delivery.sales_order_no = main_table.sales_order_no\cf0\par
-\cf2\tab\cf1\b AND\cf2\b0  t_sales_delivery_date_ans_delivery.sales_order_dtl_no = main_table.sales_order_dtl_no\cf0\par
-\cf2\tab\cf1\b AND\cf2\b0  t_sales_delivery_date_ans_delivery.sales_order_delivery_serial_no = main_table.sales_order_delivery_serial_no\cf0\par
-\cf2\tab\cf1\b AND\cf2\b0  t_sales_delivery_date_ans_delivery.is_deleted = \cf5 '0'\cf0\par
-\cf1\b INNER\cf2\b0  \cf1\b JOIN\cf2\b0  \cf3 `m_ttcg_parts`\cf2  \cf1\b ON\cf0\b0\par
-\cf2\tab m_ttcg_parts.ttcg_company_cd = main_table.own_ttcg_company_cd\cf0\par
-\cf2\tab\cf1\b AND\cf2\b0  m_ttcg_parts.glb_parts_no = main_table.glb_parts_no\cf0\par
-\cf2\tab\cf1\b AND\cf2\b0  m_ttcg_parts.is_deleted = \cf5 '0'\cf0\par
-\cf1\b INNER\cf2\b0  \cf1\b JOIN\cf2\b0  \cf3 `m_ttcg_hs_code`\cf2  \cf1\b ON\cf0\b0\par
-\cf2\tab m_ttcg_hs_code.ttcg_company_cd = main_table.own_ttcg_company_cd\cf0\par
-\cf2\tab\cf1\b AND\cf2\b0  m_ttcg_hs_code.glb_parts_no = main_table.glb_parts_no\cf0\par
-\cf2\tab\cf1\b AND\cf2\b0  m_ttcg_hs_code.forwarder_cd = main_table.responsible_forwarder_cd\cf0\par
-\cf2\tab\cf1\b AND\cf2\b0  m_ttcg_hs_code.logistics_pattern_type = main_table.logistics_pattern_type\cf0\par
-\cf2\tab\cf1\b AND\cf2\b0  m_ttcg_hs_code.is_deleted = \cf5 '0'\cf0\par
-\cf1\b LEFT\cf2\b0  \cf1\b JOIN\cf2\b0  \cf3 `t_psi_crt_header`\cf2  \cf1\b ON\cf0\b0\par
-\cf2\tab t_psi_crt_header.psi_crt_no = main_table.psi_crt_no\cf0\par
-\cf2\tab\cf1\b AND\cf2\b0  t_psi_crt_header.is_deleted = \cf5 '0'\cf0\par
-\cf1\b WHERE\cf0\b0\par
-\cf2\tab (m_ttcg_base.ttcg_company_cd = \cf5 'S005'\cf0\par
-\cf2\tab\tab\cf1\b AND\cf2\b0  m_ttcg_base.packing_instr_dest_flg = \cf4 1\cf0\par
-\cf2\tab\tab\cf1\b AND\cf2\b0  m_ttcg_base.is_deleted = \cf4 0\cf0\par
-\cf2\tab\tab\cf1\b AND\cf2\b0  main_table.out_whse_base_base_type = \cf3 "10"\cf2 )\cf0\par
-\cf2\tab\cf1\b OR\cf2\b0  (m_biz_partner_base.ttcg_company_cd = \cf5 'S005'\cf0\par
-\cf2\tab\tab\cf1\b AND\cf2\b0  m_biz_partner_base.packing_instr_dest_flg = \cf4 1\cf0\par
-\cf2\tab\tab\cf1\b AND\cf2\b0  m_biz_partner_base.is_deleted = \cf4 0\cf0\par
-\cf2\tab\tab\cf1\b AND\cf2\b0  main_table.out_whse_base_base_type = \cf3 "20"\cf2 )\cf0\par
-\cf2\tab\cf1\b AND\cf2\b0  ((\cf3 `m_ttcg_division_group`\cf2 .\cf3 `jp_section_name`\cf2  = \cf5 '\f1\'93\'8c\'83\'41\'83\'57\'83\'41\f0 G'\cf2 ))\cf0\par
-\cf2\tab\cf1\b AND\cf2\b0  ((\cf3 `m_local_biz_partner_seller`\cf2 .\cf3 `jp_biz_partner_nm`\cf2  = \cf5 'TMMK \f1\'96\'6b\'95\'c4\'83\'67\'83\'88\'83\'5e\f0  \f1\'83\'50\'83\'93\'83\'5e\'83\'62\'83\'4c\'81\'5b\'8d\'48\'8f\'ea\f0 '\cf2 ))\cf0\par
-\cf2\tab\cf1\b AND\cf2\b0  ((\cf3 `main_table`\cf2 .\cf3 `transportation_type`\cf2  = \cf5 '01'\cf2 ))\cf0\par
-\cf2\tab\cf1\b AND\cf2\b0  ((\cf3 `main_table`\cf2 .\cf3 `incoterms_cd`\cf2  = \cf5 'CIF'\cf2 ))\cf0\par
-\cf1\b LIMIT\cf2\b0  \cf4 50\cf0\f2\fs22\par
-}
- 
+
+SELECT
+	`main_table`.*
+FROM
+	`t_in_out_whse_schedule` AS `main_table`
+INNER JOIN (
+	SELECT
+		in_out_whse_schedule_no,
+		glb_parts_no,
+		MIN(moving_turn) AS moving_turn,
+		own_ttcg_company_cd
+	FROM
+		t_in_out_whse_schedule
+	LEFT JOIN m_biz_partner_base ON
+		t_in_out_whse_schedule.own_ttcg_company_cd = m_biz_partner_base.ttcg_company_cd
+		AND t_in_out_whse_schedule.out_whse_base_glb_biz_partner_cd = m_biz_partner_base.glb_biz_partner_cd
+		AND t_in_out_whse_schedule.out_whse_base_biz_partner_base_cd = m_biz_partner_base.biz_partner_base_cd
+		AND m_biz_partner_base.is_deleted = 0
+	LEFT JOIN m_ttcg_base ON
+		t_in_out_whse_schedule.own_ttcg_company_cd = m_ttcg_base.ttcg_company_cd
+		AND t_in_out_whse_schedule.out_whse_base_ttcg_base_cd = m_ttcg_base.ttcg_base_cd
+		AND m_ttcg_base.is_deleted = 0
+	WHERE
+		(( m_ttcg_base.ttcg_company_cd = 'S005'
+			AND m_ttcg_base.packing_instr_dest_flg = 1
+			AND m_ttcg_base.is_deleted = 0
+			AND t_in_out_whse_schedule.out_whse_base_base_type = '10' )
+		OR ( m_biz_partner_base.ttcg_company_cd = 'S005'
+			AND m_biz_partner_base.packing_instr_dest_flg = 1
+			AND m_biz_partner_base.is_deleted = 0
+			AND t_in_out_whse_schedule.out_whse_base_base_type = '20' ))
+		AND own_ttcg_company_cd = 'S005'
+		AND logistics_pattern_type = "02"
+		AND (psi_crt_no = ""
+			AND shipment_advisability_sts != "03")
+		AND NOT EXISTS(
+		SELECT
+			1
+		FROM
+			t_in_out_whse_schedule td
+		WHERE
+			t_in_out_whse_schedule.in_out_whse_schedule_no = td.in_out_whse_schedule_no
+			AND td.psi_crt_no <> ''
+			AND td.is_deleted = 0)
+	GROUP BY
+		in_out_whse_schedule_no,
+		glb_parts_no,
+		own_ttcg_company_cd
+UNION ALL
+	SELECT
+		tiows.in_out_whse_schedule_no,
+		tiows.glb_parts_no,
+		tiows.moving_turn,
+		tiows.own_ttcg_company_cd
+	FROM
+		t_in_out_whse_schedule tiows
+	INNER JOIN t_psi_crt_dtl tpcd ON
+		tiows.in_out_whse_schedule_no = tpcd.in_out_whse_schedule_no
+		AND tiows.dtl_no = tpcd.dtl_no
+	WHERE
+		(tiows.own_ttcg_company_cd = 'S005'
+			AND tiows.shipment_advisability_sts != "03"
+			AND tiows.dtl_no != ""
+			AND (tpcd.psi_dtl_invalid_flg = 1
+				OR tpcd.sampling_target_flg = 1)
+			AND tpcd.is_deleted = 0
+			AND tiows.is_deleted = 0)
+		OR(tpcd.psi_crt_no = 'PSS0050000030'
+			AND tpcd.psi_dtl_invalid_flg = 0
+			AND tpcd.sampling_target_flg = 0
+			AND tpcd.is_deleted = 0) ) AS `t_in_out_whse_schedule_min` ON
+	t_in_out_whse_schedule_min.in_out_whse_schedule_no = main_table.in_out_whse_schedule_no
+	AND t_in_out_whse_schedule_min.moving_turn = main_table.moving_turn
+	AND t_in_out_whse_schedule_min.own_ttcg_company_cd = main_table.own_ttcg_company_cd
+LEFT JOIN `t_in_whse_result` ON
+	t_in_whse_result.in_out_whse_schedule_no = main_table.in_out_whse_schedule_no
+	AND t_in_whse_result.dtl_no = main_table.dtl_no
+	AND t_in_whse_result.is_deleted = '0'
+INNER JOIN `m_ttcg_biz_day` ON
+	m_ttcg_biz_day.ttcg_company_cd = 'S005'
+	AND m_ttcg_biz_day.is_deleted = '0'
+INNER JOIN `m_ttcg_division_group` ON
+	m_ttcg_division_group.ttcg_company_cd = main_table.own_ttcg_company_cd
+	AND m_ttcg_division_group.ttcg_section_cd = main_table.in_out_whse_func_section_cd
+	AND m_ttcg_division_group.start_date <= m_ttcg_biz_day.biz_date
+	AND m_ttcg_division_group.end_date >= m_ttcg_biz_day.biz_date
+	AND m_ttcg_division_group.is_deleted = '0'
+INNER JOIN `m_local_biz_partner` AS `m_local_biz_partner_end_user` ON
+	m_local_biz_partner_end_user.ttcg_company_cd = main_table.own_ttcg_company_cd
+	AND m_local_biz_partner_end_user.glb_biz_partner_cd = main_table.eur_glb_biz_partner_cd
+	AND m_local_biz_partner_end_user.is_deleted = '0'
+INNER JOIN `m_biz_partner_base` AS `m_biz_partner_base_end_user` ON
+	m_biz_partner_base_end_user.ttcg_company_cd = main_table.own_ttcg_company_cd
+	AND m_biz_partner_base_end_user.glb_biz_partner_cd = main_table.eur_glb_biz_partner_cd
+	AND m_biz_partner_base_end_user.biz_partner_base_cd = main_table.eur_biz_partner_base_cd
+	AND m_biz_partner_base_end_user.is_deleted = '0'
+INNER JOIN `m_local_biz_partner` AS `m_local_biz_partner_seller` ON
+	m_local_biz_partner_seller.ttcg_company_cd = main_table.own_ttcg_company_cd
+	AND m_local_biz_partner_seller.glb_biz_partner_cd = main_table.sales_glb_biz_partner_cd
+	AND m_local_biz_partner_seller.is_deleted = '0'
+INNER JOIN (
+	SELECT
+		tiows.in_whse_base_base_type,
+		tiows.in_whse_base_ttcg_base_cd,
+		tiows.in_whse_base_glb_biz_partner_cd,
+		tiows.in_out_whse_schedule_no,
+		tiows.own_ttcg_company_cd,
+		tiows.out_whse_base_biz_partner_type,
+		tiows.in_whse_base_biz_partner_type,
+		tiows.sts
+	FROM
+		t_in_out_whse_schedule tiows
+	INNER JOIN (
+		SELECT
+			in_out_whse_schedule_no,
+			own_ttcg_company_cd,
+			MAX(moving_turn) AS moving_turn
+		FROM
+			t_in_out_whse_schedule
+		WHERE
+			is_deleted = 0
+			AND out_whse_base_biz_partner_type = "02"
+		GROUP BY
+			in_out_whse_schedule_no,
+			own_ttcg_company_cd) AS t_in_out_whse_schedule_mv ON
+		tiows.in_out_whse_schedule_no = t_in_out_whse_schedule_mv.in_out_whse_schedule_no
+		AND tiows.moving_turn = t_in_out_whse_schedule_mv.moving_turn
+		AND tiows.out_whse_base_biz_partner_type = "02"
+		AND tiows.own_ttcg_company_cd = t_in_out_whse_schedule_mv.own_ttcg_company_cd) AS `t_in_out_whse_schedule_max` ON
+	t_in_out_whse_schedule_max.in_out_whse_schedule_no = main_table.in_out_whse_schedule_no
+LEFT JOIN `m_ttcg_base` AS `m_ttcg_base_deli_des` ON
+	m_ttcg_base_deli_des.ttcg_company_cd = t_in_out_whse_schedule_max.own_ttcg_company_cd
+	AND m_ttcg_base_deli_des.ttcg_base_cd = t_in_out_whse_schedule_max.in_whse_base_ttcg_base_cd
+	AND t_in_out_whse_schedule_max.in_whse_base_base_type = '10'
+	AND m_ttcg_base_deli_des.is_deleted = '0'
+LEFT JOIN `m_local_biz_partner` AS `m_local_biz_partner_deli_des` ON
+	m_local_biz_partner_deli_des.ttcg_company_cd = t_in_out_whse_schedule_max.own_ttcg_company_cd
+	AND m_local_biz_partner_deli_des.glb_biz_partner_cd = t_in_out_whse_schedule_max.in_whse_base_glb_biz_partner_cd
+	AND t_in_out_whse_schedule_max.in_whse_base_biz_partner_type = '20'
+	AND m_local_biz_partner_deli_des.is_deleted = '0'
+INNER JOIN (
+	SELECT
+		tiows.own_ttcg_company_cd,
+		tiows.out_whse_base_biz_partner_type,
+		tiows.out_whse_base_glb_biz_partner_cd,
+		tiows.in_out_whse_schedule_no
+	FROM
+		t_in_out_whse_schedule tiows
+	INNER JOIN (
+		SELECT
+			in_out_whse_schedule_no,
+			own_ttcg_company_cd,
+			MAX(moving_turn) AS moving_turn
+		FROM
+			t_in_out_whse_schedule
+		WHERE
+			is_deleted = 0
+			AND out_whse_base_biz_partner_type = "04"
+		GROUP BY
+			in_out_whse_schedule_no,
+			own_ttcg_company_cd) AS t_in_out_whse_schedule_mv ON
+		tiows.in_out_whse_schedule_no = t_in_out_whse_schedule_mv.in_out_whse_schedule_no
+		AND tiows.moving_turn = t_in_out_whse_schedule_mv.moving_turn
+		AND tiows.out_whse_base_biz_partner_type = "04"
+		AND tiows.is_deleted = 0
+		AND tiows.own_ttcg_company_cd = t_in_out_whse_schedule_mv.own_ttcg_company_cd) AS `t_in_out_whse_schedule_max_forwarder` ON
+	t_in_out_whse_schedule_max_forwarder.in_out_whse_schedule_no = main_table.in_out_whse_schedule_no
+INNER JOIN `m_local_biz_partner` AS `m_local_biz_partner_forwarder` ON
+	m_local_biz_partner_forwarder.ttcg_company_cd = t_in_out_whse_schedule_max_forwarder.own_ttcg_company_cd
+	AND m_local_biz_partner_forwarder.glb_biz_partner_cd = t_in_out_whse_schedule_max_forwarder.out_whse_base_glb_biz_partner_cd
+	AND m_local_biz_partner_forwarder.is_deleted = '0'
+INNER JOIN `m_quantity_unit` ON
+	m_quantity_unit.quantity_unit_cd = main_table.quantity_unit_cd
+	AND m_quantity_unit.is_deleted = '0'
+INNER JOIN `t_sales_order_dtl` ON
+	t_sales_order_dtl.sales_order_no = main_table.sales_order_no
+	AND t_sales_order_dtl.sales_order_dtl_no = main_table.sales_order_dtl_no
+	AND t_sales_order_dtl.is_deleted = '0'
+INNER JOIN `t_sales_delivery_date_ans_delivery` ON
+	t_sales_delivery_date_ans_delivery.sales_order_no = main_table.sales_order_no
+	AND t_sales_delivery_date_ans_delivery.sales_order_dtl_no = main_table.sales_order_dtl_no
+	AND t_sales_delivery_date_ans_delivery.sales_order_delivery_serial_no = main_table.sales_order_delivery_serial_no
+	AND t_sales_delivery_date_ans_delivery.is_deleted = '0'
+INNER JOIN `m_ttcg_parts` ON
+	m_ttcg_parts.ttcg_company_cd = main_table.own_ttcg_company_cd
+	AND m_ttcg_parts.glb_parts_no = main_table.glb_parts_no
+	AND m_ttcg_parts.is_deleted = '0'
+INNER JOIN `m_ttcg_hs_code` ON
+	m_ttcg_hs_code.ttcg_company_cd = main_table.own_ttcg_company_cd
+	AND m_ttcg_hs_code.glb_parts_no = main_table.glb_parts_no
+	AND m_ttcg_hs_code.forwarder_cd = main_table.responsible_forwarder_cd
+	AND m_ttcg_hs_code.logistics_pattern_type = main_table.logistics_pattern_type
+	AND m_ttcg_hs_code.is_deleted = '0'
+LEFT JOIN `t_psi_crt_header` ON
+	t_psi_crt_header.psi_crt_no = main_table.psi_crt_no
+	AND t_psi_crt_header.is_deleted = '0'
+WHERE
+	(main_table.is_deleted = 0)
+	AND ((`m_ttcg_division_group`.`jp_section_name` = '東アジアG'))
+	AND ((`m_local_biz_partner_seller`.`jp_biz_partner_nm` = 'TMMK 北米トヨタ ケンタッキー工場'))
+	AND ((`main_table`.`transportation_type` = '03'))
+	AND ((`main_table`.`in_whse_schedule_date` <= '2022-01-01'))
+	AND ((IFNULL(t_in_whse_result.in_whse_result_date, "") <= '2022-01-01'))
+	AND ((`main_table`.`incoterms_cd` = 'CIF'))
