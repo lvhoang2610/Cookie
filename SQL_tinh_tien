@@ -1,77 +1,18 @@
-SELECT
-	SUM((IFNULL(t_sales_order_dtl.order_unit, 0) * IFNULL(t_sales_order_delivery.sales_delivery_hope_quantity, 0) ) * CASE WHEN m_ttcg_company.ttcg_company_currency_cd <> t_sales_order_header.sal_currency_cd
-	THEN m_monthly_exchange_rate_sal.monthly_exchange_rate ELSE 1 END ) AS `TotalSales`,
-	SUM(( IFNULL(t_purchase_order_dtl.purchase_order_unit, 0) * IFNULL(t_purchase_order_delivery.purchase_delivery_hope_quantity, 0) + (IFNULL(t_purchase_delivery_date_ans_delivery.shipping_fee, 0) +
-	IFNULL(t_purchase_delivery_date_ans_delivery.doc_preparation_fee, 0) + IFNULL(t_purchase_delivery_date_ans_delivery.others_expense, 0) ) ) * 
-	CASE WHEN m_ttcg_company.ttcg_company_currency_cd <> t_purchase_order_header.sup_currency_cd THEN m_monthly_exchange_rate_sup.monthly_exchange_rate ELSE 1 END ) AS `TotalPurchase`,
-	`m_currency`.`jp_currency_nm`,
-	`m_currency`.`en_currency_nm`,
-	`m_currency`.`ch_currency_nm`,
-	`m_currency`.`currency_cd`
-
-FROM
-	`t_in_out_whse_schedule` AS `main_table`
-INNER JOIN `t_purchase_order_dtl` ON
-	t_purchase_order_dtl.purchase_order_no = main_table.purchase_order_no
-AND t_purchase_order_dtl.purchase_order_dtl_no = main_table.purchase_order_dtl_no
-AND t_purchase_order_dtl.is_deleted = '0'
-INNER JOIN `t_purchase_order_delivery` ON
-	t_purchase_order_delivery.purchase_order_no = main_table.purchase_order_no
-AND t_purchase_order_delivery.purchase_order_dtl_no = main_table.purchase_order_dtl_no
-AND t_purchase_order_delivery.purchase_order_delivery_serial_no = main_table.purchase_order_delivery_serial_no
-AND t_purchase_order_delivery.is_deleted = '0'
-INNER JOIN `t_purchase_delivery_date_ans_delivery` ON
-	t_purchase_delivery_date_ans_delivery.purchase_order_no = main_table.purchase_order_no
-AND t_purchase_delivery_date_ans_delivery.purchase_order_dtl_no = main_table.purchase_order_dtl_no
-AND t_purchase_delivery_date_ans_delivery.purchase_order_delivery_serial_no = main_table.purchase_order_delivery_serial_no
-AND t_purchase_delivery_date_ans_delivery.is_deleted = '0'
-INNER JOIN `t_sales_order_dtl` ON
-	t_sales_order_dtl.sales_order_no = main_table.sales_order_no
-AND t_sales_order_dtl.sales_order_dtl_no = main_table.sales_order_dtl_no
-AND t_sales_order_dtl.is_deleted = '0'
-INNER JOIN `t_sales_order_delivery` ON
-	t_sales_order_delivery.sales_order_no = main_table.sales_order_no
-AND t_sales_order_delivery.sales_order_dtl_no = main_table.sales_order_dtl_no
-AND t_sales_order_delivery.sales_order_delivery_serial_no = main_table.sales_order_delivery_serial_no
-AND t_sales_order_delivery.is_deleted = '0'
-LEFT JOIN `m_ttcg_company` ON
-	m_ttcg_company.ttcg_company_cd = 'S005'
-AND m_ttcg_company.is_deleted = '0'
-LEFT JOIN `t_sales_order_header` ON
-	t_sales_order_header.sales_order_no = t_sales_order_dtl.sales_order_no
-AND t_sales_order_header.is_deleted = '0'
-LEFT JOIN `m_ttcg_exchange_rate` AS `m_ttcg_exchange_rate_sal` ON
-	m_ttcg_exchange_rate_sal.ttcg_company_cd = m_ttcg_company.ttcg_company_cd
-AND m_ttcg_exchange_rate_sal.from_currency_cd = t_sales_order_header.sal_currency_cd
-AND m_ttcg_exchange_rate_sal.to_currency_cd = m_ttcg_company.ttcg_company_currency_cd
-AND m_ttcg_exchange_rate_sal.is_deleted = '0'
-LEFT JOIN `t_purchase_order_header` ON
-	t_purchase_order_header.purchase_order_no = t_sales_order_header.ex_purchase_order_no
-AND t_purchase_order_header.is_deleted = '0'
-LEFT JOIN `m_ttcg_exchange_rate` AS `m_ttcg_exchange_rate_sup` ON
-	m_ttcg_exchange_rate_sup.ttcg_company_cd = m_ttcg_company.ttcg_company_cd
-AND m_ttcg_exchange_rate_sup.from_currency_cd = t_purchase_order_header.sup_currency_cd
-AND m_ttcg_exchange_rate_sup.to_currency_cd = m_ttcg_company.ttcg_company_currency_cd
-AND m_ttcg_exchange_rate_sup.is_deleted = '0'
-LEFT JOIN `m_ttcg_biz_day` ON
-	m_ttcg_biz_day.ttcg_company_cd = m_ttcg_company.ttcg_company_cd
-AND m_ttcg_biz_day.is_deleted = '0'
-LEFT JOIN `m_monthly_exchange_rate` AS `m_monthly_exchange_rate_sal` ON
-	m_monthly_exchange_rate_sal.exchange_rate_cd = m_ttcg_exchange_rate_sal.exchange_rate_cd
-AND m_monthly_exchange_rate_sal.exchange_rate_year_month = m_ttcg_biz_day.biz_date
-AND m_monthly_exchange_rate_sal.is_deleted = '0'
-LEFT JOIN `m_monthly_exchange_rate` AS `m_monthly_exchange_rate_sup` ON
-	m_monthly_exchange_rate_sup.exchange_rate_cd = m_ttcg_exchange_rate_sup.exchange_rate_cd
-AND m_monthly_exchange_rate_sup.exchange_rate_year_month = m_ttcg_biz_day.biz_date
-AND m_monthly_exchange_rate_sup.is_deleted = '0'
-LEFT JOIN `m_currency` ON
-	m_currency.currency_cd = m_ttcg_company.ttcg_company_currency_cd
-AND m_currency.is_deleted = '0'
-WHERE
-	(main_table.auto_id IN ('16250'))
-AND (main_table.is_deleted = 0)
-GROUP BY
-	`m_currency`.`jp_currency_nm`,
+SELECT SUM((IFNULL(t_sales_order_dtl.order_unit,0) *                 IFNULL(t_sales_order_delivery.sales_delivery_hope_quantity,0)             ) * CASE WHEN m_ttcg_company.ttcg_company_currency_cd                 <> t_sales_order_header.sal_currency_cd                 THEN m_monthly_exchange_rate_sal.monthly_exchange_rate                 ELSE 1                 END             ) AS `TotalSales`, SUM((                 IFNULL(t_purchase_order_dtl.purchase_order_unit,0) *                 IFNULL(t_purchase_order_delivery.purchase_delivery_hope_quantity,0) + (IFNULL(t_purchase_delivery_date_ans_delivery.shipping_fee,0) +                     IFNULL(t_purchase_delivery_date_ans_delivery.doc_preparation_fee,0) +                     IFNULL(t_purchase_delivery_date_ans_delivery.others_expense,0)                 )             ) * CASE WHEN m_ttcg_company.ttcg_company_currency_cd                 <> t_purchase_order_header.sup_currency_cd                 THEN m_monthly_exchange_rate_sup.monthly_exchange_rate                 ELSE 1                 END             ) AS `TotalPurchase`, `m_currency`.`jp_currency_nm`, `m_currency`.`en_currency_nm`, `m_currency`.`ch_currency_nm`, `m_currency`.`currency_cd` FROM `t_in_out_whse_schedule` AS `main_table`
+ LEFT JOIN `t_purchase_order_dtl` ON t_purchase_order_dtl.purchase_order_no = main_table.purchase_order_no AND t_purchase_order_dtl.purchase_order_dtl_no = main_table.purchase_order_dtl_no AND t_purchase_order_dtl.is_deleted = '0'
+ LEFT JOIN `t_purchase_order_delivery` ON t_purchase_order_delivery.purchase_order_no = main_table.purchase_order_no AND t_purchase_order_delivery.purchase_order_dtl_no = main_table.purchase_order_dtl_no AND t_purchase_order_delivery.purchase_order_delivery_serial_no = main_table.purchase_order_delivery_serial_no AND t_purchase_order_delivery.is_deleted = '0'
+ LEFT JOIN `t_purchase_delivery_date_ans_delivery` ON t_purchase_delivery_date_ans_delivery.purchase_order_no = main_table.purchase_order_no AND t_purchase_delivery_date_ans_delivery.purchase_order_dtl_no = main_table.purchase_order_dtl_no AND t_purchase_delivery_date_ans_delivery.purchase_order_delivery_serial_no = main_table.purchase_order_delivery_serial_no AND t_purchase_delivery_date_ans_delivery.is_deleted = '0'
+ LEFT JOIN `t_sales_order_dtl` ON t_sales_order_dtl.sales_order_no = main_table.sales_order_no AND t_sales_order_dtl.sales_order_dtl_no = main_table.sales_order_dtl_no AND t_sales_order_dtl.is_deleted = '0'
+ LEFT JOIN `t_sales_order_delivery` ON t_sales_order_delivery.sales_order_no = main_table.sales_order_no AND t_sales_order_delivery.sales_order_dtl_no = main_table.sales_order_dtl_no AND t_sales_order_delivery.sales_order_delivery_serial_no = main_table.sales_order_delivery_serial_no AND t_sales_order_delivery.is_deleted = '0'
+ LEFT JOIN `m_ttcg_company` ON m_ttcg_company.ttcg_company_cd = 'S005' AND m_ttcg_company.is_deleted = '0'
+ LEFT JOIN `t_sales_order_header` ON t_sales_order_header.sales_order_no = t_sales_order_dtl.sales_order_no AND t_sales_order_header.is_deleted = '0'
+ LEFT JOIN `m_ttcg_exchange_rate` AS `m_ttcg_exchange_rate_sal` ON m_ttcg_exchange_rate_sal.ttcg_company_cd = m_ttcg_company.ttcg_company_cd AND m_ttcg_exchange_rate_sal.from_currency_cd = t_sales_order_header.sal_currency_cd AND m_ttcg_exchange_rate_sal.to_currency_cd = m_ttcg_company.ttcg_company_currency_cd AND m_ttcg_exchange_rate_sal.is_deleted = '0'
+ LEFT JOIN `t_purchase_order_header` ON t_purchase_order_header.purchase_order_no = t_sales_order_header.ex_purchase_order_no AND t_purchase_order_header.is_deleted = '0'
+ LEFT JOIN `m_ttcg_exchange_rate` AS `m_ttcg_exchange_rate_sup` ON m_ttcg_exchange_rate_sup.ttcg_company_cd = m_ttcg_company.ttcg_company_cd AND m_ttcg_exchange_rate_sup.from_currency_cd = t_purchase_order_header.sup_currency_cd AND m_ttcg_exchange_rate_sup.to_currency_cd = m_ttcg_company.ttcg_company_currency_cd AND m_ttcg_exchange_rate_sup.is_deleted = '0'
+ LEFT JOIN `m_ttcg_biz_day` ON m_ttcg_biz_day.ttcg_company_cd = m_ttcg_company.ttcg_company_cd AND m_ttcg_biz_day.is_deleted = '0'
+ LEFT JOIN `m_monthly_exchange_rate` AS `m_monthly_exchange_rate_sal` ON m_monthly_exchange_rate_sal.exchange_rate_cd = m_ttcg_exchange_rate_sal.exchange_rate_cd AND m_monthly_exchange_rate_sal.exchange_rate_year_month = DATE_FORMAT(m_ttcg_biz_day.biz_date, "%Y%m") AND m_monthly_exchange_rate_sal.is_deleted = '0'
+ LEFT JOIN `m_monthly_exchange_rate` AS `m_monthly_exchange_rate_sup` ON m_monthly_exchange_rate_sup.exchange_rate_cd = m_ttcg_exchange_rate_sup.exchange_rate_cd AND m_monthly_exchange_rate_sup.exchange_rate_year_month = DATE_FORMAT(m_ttcg_biz_day.biz_date, "%Y%m") AND m_monthly_exchange_rate_sup.is_deleted = '0'
+ LEFT JOIN `m_currency` ON m_currency.currency_cd = m_ttcg_company.ttcg_company_currency_cd AND m_currency.is_deleted = '0' WHERE (main_table.auto_id IN ('100001', '100002')) AND (main_table.is_deleted = 0) GROUP BY `m_currency`.`jp_currency_nm`,
 	`m_currency`.`en_currency_nm`,
 	`m_currency`.`ch_currency_nm`,
 	`m_currency`.`currency_cd`
