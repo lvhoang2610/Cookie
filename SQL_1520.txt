@@ -1,3 +1,29 @@
-INSERT INTO db_gjdx_mysql.m_ttcg_staff_selection
-(auto_id, ttcg_company_cd, glb_biz_partner_cd, biz_partner_base_cd, work_process_cd, ttcg_staff_id, priority, create_at, operation_type, register_type, registration_source_type, update_function_id, update_by, update_at, is_deleted)
-VALUES(7, 'S005', 's001', 's0001', '30', 'laiviethoang_ttcg_admin', NULL, '2022-01-28 10:17:13', NULL, NULL, NULL, NULL, NULL, '2022-03-24 06:07:30', 0);
+SELECT																																									
+			t_in_out_whse_schedule.sales_order_no,																																						
+			t_in_out_whse_schedule.limit_mng_no ,																																				
+			t_in_out_whse_schedule.sales_order_dtl_no,																																						
+			t_in_out_whse_schedule.glb_parts_no ,																																			
+			t_in_out_whse_schedule.customer_biz_partner_parts_no,																																						
+			t_in_out_whse_schedule.mnfct_parts_model ,																																			
+			t_in_out_whse_schedule.parts_type ,																																	
+			t_sales_order_dtl.order_unit ,																																
+			t_sales_order_dtl.order_quantity ,																																	
+			t_sales_order_dtl.order_quantity_unit_cd ,																																			
+			t_sales_order_dtl.tax_rate ,																															
+			t_sales_order_dtl.tax_type ,																															
+			m_glb_biz_partner.glb_biz_partner_cd 
+FROM																																									
+			t_in_out_whse_schedule
+INNER JOIN m_glb_biz_partner ON
+	m_glb_biz_partner.glb_biz_partner_cd = t_in_out_whse_schedule.sales_glb_biz_partner_cd
+	AND m_glb_biz_partner.is_deleted = 0
+INNER JOIN t_psi_crt_header ON
+	t_psi_crt_header.psi_crt_no = t_in_out_whse_schedule.psi_crt_no
+	AND t_psi_crt_header.is_deleted = 0
+LEFT OUTER JOIN t_sales_order_dtl ON																													
+			t_sales_order_dtl.sales_order_no = t_in_out_whse_schedule.sales_order_no
+	AND t_sales_order_dtl.sales_order_dtl_no = t_in_out_whse_schedule.sales_order_dtl_no
+	AND t_sales_order_dtl.is_deleted = 0
+WHERE																																									
+			t_in_out_whse_schedule.auto_id = $autoID
+	AND t_in_out_whse_schedule.is_deleted = 0
