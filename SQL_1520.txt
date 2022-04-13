@@ -1,29 +1,22 @@
 SELECT																																									
-			t_in_out_whse_schedule.sales_order_no,																																						
-			t_in_out_whse_schedule.limit_mng_no ,																																				
-			t_in_out_whse_schedule.sales_order_dtl_no,																																						
-			t_in_out_whse_schedule.glb_parts_no ,																																			
-			t_in_out_whse_schedule.customer_biz_partner_parts_no,																																						
-			t_in_out_whse_schedule.mnfct_parts_model ,																																			
-			t_in_out_whse_schedule.parts_type ,																																	
-			t_sales_order_dtl.order_unit ,																																
-			t_sales_order_dtl.order_quantity ,																																	
-			t_sales_order_dtl.order_quantity_unit_cd ,																																			
-			t_sales_order_dtl.tax_rate ,																															
-			t_sales_order_dtl.tax_type ,																															
-			m_glb_biz_partner.glb_biz_partner_cd 
+			m_customer_credit_limit.credit_limit_amount ,																																				
+			m_customer_credit_limit.credit_balance ,																																		
+			t_recv_order_balance_ttl.recv_order_balance
 FROM																																									
 			t_in_out_whse_schedule
-INNER JOIN m_glb_biz_partner ON
-	m_glb_biz_partner.glb_biz_partner_cd = t_in_out_whse_schedule.sales_glb_biz_partner_cd
-	AND m_glb_biz_partner.is_deleted = 0
-INNER JOIN t_psi_crt_header ON
-	t_psi_crt_header.psi_crt_no = t_in_out_whse_schedule.psi_crt_no
-	AND t_psi_crt_header.is_deleted = 0
-LEFT OUTER JOIN t_sales_order_dtl ON																													
-			t_sales_order_dtl.sales_order_no = t_in_out_whse_schedule.sales_order_no
-	AND t_sales_order_dtl.sales_order_dtl_no = t_in_out_whse_schedule.sales_order_dtl_no
-	AND t_sales_order_dtl.is_deleted = 0
+LEFT OUTER JOIN m_customer_credit_limit ON																											
+			m_customer_credit_limit.ttcg_company_cd = t_in_out_whse_schedule.own_ttcg_company_cd
+	AND m_customer_credit_limit.ttcg_section_cd = t_in_out_whse_schedule.in_out_whse_func_section_cd
+	AND m_customer_credit_limit.glb_biz_partner_cd = t_in_out_whse_schedule.in_whse_base_glb_biz_partner_cd
+	AND m_customer_credit_limit.limit_mng_no = t_in_out_whse_schedule.limit_mng_no
+	AND m_customer_credit_limit.currency_cd = t_in_out_whse_schedule.sales_currency_cd
+	AND m_customer_credit_limit.is_deleted = 0
+LEFT OUTER JOIN t_recv_order_balance_ttl ON																										
+			t_recv_order_balance_ttl.ttcg_company_cd = t_in_out_whse_schedule.own_ttcg_company_cd
+	AND t_recv_order_balance_ttl.ttcg_section_cd = t_in_out_whse_schedule.in_out_whse_func_section_cd
+	AND t_recv_order_balance_ttl.glb_biz_partner_cd = t_in_out_whse_schedule.in_whse_base_glb_biz_partner_cd
+	AND t_recv_order_balance_ttl.currency_cd = t_in_out_whse_schedule.sales_currency_cd
+	AND t_recv_order_balance_ttl.is_deleted = 0
 WHERE																																									
-			t_in_out_whse_schedule.auto_id = $autoID
-	AND t_in_out_whse_schedule.is_deleted = 0
+			t_in_out_whse_schedule.is_deleted = 0
+	AND t_in_out_whse_schedule.auto_id = '100001'
