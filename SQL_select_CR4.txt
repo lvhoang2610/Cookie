@@ -1,6 +1,0 @@
-INSERT INTO db_gjdx_mysql.t_psi_crt_dtl
-(auto_id, psi_crt_no, psi_crt_dtl_no, in_out_whse_schedule_no, dtl_no, psi_dtl_invalid_flg, sampling_target_flg, sampling_exec_date, create_at, operation_type, register_type, registration_source_type, update_function_id, update_by, update_at, is_deleted)
-VALUES(3092, 'H1520_1', '1', 'HS101', '00004', 0, 0, '2021-12-21', '2022-02-26 08:07:24', '09', NULL, '01', 'POTGI1520', 'laiviethoang_ttcg_admin', '2022-03-25 08:52:57', 0);
-INSERT INTO db_gjdx_mysql.t_psi_crt_dtl
-(auto_id, psi_crt_no, psi_crt_dtl_no, in_out_whse_schedule_no, dtl_no, psi_dtl_invalid_flg, sampling_target_flg, sampling_exec_date, create_at, operation_type, register_type, registration_source_type, update_function_id, update_by, update_at, is_deleted)
-VALUES(3129, 'H1520_2', '1', 'HS102', '00004', 0, 0, '2021-12-21', '2022-02-26 08:07:24', '09', NULL, '01', 'POTGI1520', 'laiviethoang_ttcg_admin', '2022-03-25 12:33:29', 0);
